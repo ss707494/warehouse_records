@@ -7,13 +7,13 @@ const menuData = [{
   value: '/home',
   pushPath: '/home',
 }, {
-  label: '列表',
-  value: '/everyDayData',
-  pushPath: '/everyDayData/list',
-}, {
   label: '记录',
   value: '/simpleRecord',
   pushPath: '/simpleRecord/update',
+}, {
+  label: '列表',
+  value: '/everyDayData',
+  pushPath: '/everyDayData/list',
 }]
 
 export const MenuLayout = ({children}: any) => {
