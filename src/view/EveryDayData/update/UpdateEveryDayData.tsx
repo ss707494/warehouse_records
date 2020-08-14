@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react'
 import {Button, TextField} from '@material-ui/core'
-import {fpSetPre, ls, setForm} from '../../../util/utils'
+import {fpMergePre, fpSetPre, ls, setForm} from '../../../util/utils'
 import {useHistory} from 'react-router-dom'
 import styled from 'styled-components'
 import {KeyboardDatePicker} from '@material-ui/pickers'
@@ -11,15 +11,16 @@ import {Space} from '../../../component/Space'
 import {showNotistack} from '../../../component/SnackbarProvider'
 
 const initForm = {
-  amount: 0,
-  humidity: 0,
+  amount: '',
+  humidity: '',
   isDelete: 0,
   produceType: '',
-  temperature: 0,
+  temperature: '',
   weather: '',
 }
 export const updateEveryDayDataModel = modelFactory('UpdateEveryDayData', {
   form: initForm as IRecord,
+  tip: '',
 }, {
   setForm: setForm,
   clearForm: (value, option) => {
@@ -32,11 +33,11 @@ export const updateEveryDayDataModel = modelFactory('UpdateEveryDayData', {
     option.setData(fpSetPre('form', value))
   },
   saveOne: async (value, option) => {
-    console.log(option.data.form)
     return db.record.put({
       ...option.data.form,
     })
   },
+  setTip: (value, option) => option.setData(fpMergePre({tip: value}))
 })
 
 const Box = styled.div`

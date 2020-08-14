@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react'
+import React, {useCallback, useEffect, useRef} from 'react'
 import {useParams, useHistory} from 'react-router-dom'
 import {useStoreModel} from '../../../util/ModelAction/useStore'
 import {everyDayDataListModel} from '../../EveryDayData/list'
@@ -31,7 +31,7 @@ const Header = styled.div`
     top: 16px;
   }
 `
-const MainForm = styled.div`
+const MainForm = styled.div<{ref: any}>`
   display: grid;
 `
 const FormItem = styled.div`
@@ -64,14 +64,22 @@ const Foot = styled.div`
 `
 
 export const UpdateRecord = () => {
+  const mainForm = useRef(null)
   const {id} = useParams()
   const isAdd = id === '0'
   const history = useHistory()
   const {actions: actionsEveryDayDataListModel, state: stateEveryDayDataListModel} = useStoreModel(everyDayDataListModel)
   const {actions: actionsUpdateEveryDayData, state: stateUpdateEveryDayData} = useStoreModel(updateEveryDayDataModel)
+  const init = useCallback(async () => {
+    const res = await actionsEveryDayDataListModel.getList()
+    if (!isAdd && res.length === 0) {
+      debugger
+      history.push(`/simpleRecord/update/0`)
+    }
+  }, [actionsEveryDayDataListModel, history, isAdd])
   useEffect(() => {
-    actionsEveryDayDataListModel.getList()
-  }, [actionsEveryDayDataListModel])
+    init()
+  }, [init])
   const index = stateEveryDayDataListModel.list.findIndex(v => v.id === ~~id)
   const item = stateEveryDayDataListModel.list?.[index]
   useEffect(() => {
@@ -84,9 +92,40 @@ export const UpdateRecord = () => {
       actionsUpdateEveryDayData.clearForm()
     }
   }, [actionsUpdateEveryDayData, isAdd])
+  const submit = useCallback(async () => {
+    const res = await actionsUpdateEveryDayData.saveOne()
+    if (res) {
+      showNotistack('操作成功')
+      await actionsEveryDayDataListModel.getList()
+      if (isAdd && res) {
+        history.push(`/simpleRecord/update/${res}`)
+      }
+    }
+  }, [actionsEveryDayDataListModel, actionsUpdateEveryDayData, history, isAdd])
+  useEffect(() => {
+    // next focus
+    if (mainForm?.current) {
+      const focusHelp = (e: any) => {
+        if (e.charCode === 13) {
+          // @ts-ignore
+          const inputList = [...document.querySelectorAll('input')]
+          const i = inputList.indexOf(e.target)
+          if (inputList.length === i + 1) {
+            submit()
+          } else {
+            inputList[i + 1].focus()
+          }
+        }
+      }
+      // @ts-ignore
+      mainForm?.current?.addEventListener('keypress', focusHelp)
+      return () => {
+        // @ts-ignore
+        mainForm?.current?.removeEventListener('keypress', focusHelp)
+      }
+    }
+  }, [actionsUpdateEveryDayData, submit])
 
-  console.log(stateEveryDayDataListModel.list)
-  console.log(isAdd)
   return <Box>
     <Header>
       <span>
@@ -105,7 +144,9 @@ export const UpdateRecord = () => {
       </aside>}
     </Header>
     <Divider/>
-    <MainForm>
+    <MainForm
+        ref={mainForm}
+    >
       <FormItem>
         <aside>{ls('日期')}</aside>
         <main>
@@ -198,16 +239,7 @@ export const UpdateRecord = () => {
             size={'large'}
             variant={'contained'}
             color={'primary'}
-            onClick={async () => {
-              const res = await actionsUpdateEveryDayData.saveOne()
-              if (res) {
-                showNotistack('操作成功')
-                actionsEveryDayDataListModel.getList()
-                if (isAdd && res) {
-                  history.push(`/simpleRecord/update/${res}`)
-                }
-              }
-            }}
+            onClick={submit}
         >保存</Button>
       </Foot>
     </MainForm>
