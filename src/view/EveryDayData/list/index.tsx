@@ -8,7 +8,7 @@ import {modelFactory} from '../../../util/ModelAction/modelUtil'
 import {db, IRecord} from '../../../util/db/appData'
 import {useStoreModel} from '../../../util/ModelAction/useStore'
 
-const everyDayDataListModel = modelFactory('EveryDayDataList', {
+export const everyDayDataListModel = modelFactory('EveryDayDataList', {
   list: [] as IRecord[],
 }, {
   getList: async (value, option) => {
@@ -16,6 +16,7 @@ const everyDayDataListModel = modelFactory('EveryDayDataList', {
     option.setData(fpMergePre({
       list: res,
     }))
+    return res
   },
 })
 

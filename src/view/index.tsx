@@ -6,6 +6,7 @@ import {DateWrapperApollo} from '../component/DateWarpper'
 import {SnackbarProviderWrapper} from '../component/SnackbarProvider'
 import {NoMatch} from '../component/NoMatch'
 import {everyDayDataRouter} from './EveryDayData/router'
+import { SimpleRecordRouter } from './SimpleRecord/router'
 
 const routes = [
   {
@@ -13,6 +14,7 @@ const routes = [
     component: Home,
   },
   ...everyDayDataRouter,
+  ...SimpleRecordRouter,
 ]
 
 export default function RouteConfig() {

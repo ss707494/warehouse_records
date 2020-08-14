@@ -3,13 +3,17 @@ import {AppBar, Tab, Tabs} from '@material-ui/core'
 import {useLocation, useHistory} from 'react-router-dom'
 
 const menuData = [{
-  label: '首页',
+  label: '趋势图',
   value: '/home',
   pushPath: '/home',
 }, {
   label: '列表',
   value: '/everyDayData',
   pushPath: '/everyDayData/list',
+}, {
+  label: '记录',
+  value: '/simpleRecord',
+  pushPath: '/simpleRecord/update',
 }]
 
 export const MenuLayout = ({children}: any) => {

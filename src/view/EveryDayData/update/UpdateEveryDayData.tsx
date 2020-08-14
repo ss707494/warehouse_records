@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react'
 import {Button, TextField} from '@material-ui/core'
-import {ls, setForm} from '../../../util/utils'
+import {fpSetPre, ls, setForm} from '../../../util/utils'
 import {useHistory} from 'react-router-dom'
 import styled from 'styled-components'
 import {KeyboardDatePicker} from '@material-ui/pickers'
@@ -10,19 +10,30 @@ import {useStoreModel} from '../../../util/ModelAction/useStore'
 import {Space} from '../../../component/Space'
 import {showNotistack} from '../../../component/SnackbarProvider'
 
-const updateEveryDayDataModel = modelFactory('UpdateEveryDayData', {
-  form: {
-    amount: 0,
-    humidity: 0,
-    isDelete: 0,
-    produceType: '',
-    temperature: 0,
-    weather: '',
-  } as IRecord,
+const initForm = {
+  amount: 0,
+  humidity: 0,
+  isDelete: 0,
+  produceType: '',
+  temperature: 0,
+  weather: '',
+}
+export const updateEveryDayDataModel = modelFactory('UpdateEveryDayData', {
+  form: initForm as IRecord,
 }, {
   setForm: setForm,
+  clearForm: (value, option) => {
+    option.setData(fpSetPre('form', {
+      ...initForm,
+      createDate: new Date(),
+    }))
+  },
+  setOneItem: (value: IRecord, option) => {
+    option.setData(fpSetPre('form', value))
+  },
   saveOne: async (value, option) => {
-    return db.record.add({
+    console.log(option.data.form)
+    return db.record.put({
       ...option.data.form,
     })
   },
