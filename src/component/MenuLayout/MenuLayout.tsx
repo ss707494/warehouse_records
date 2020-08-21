@@ -1,6 +1,7 @@
 import React from 'react'
 import {AppBar, Tab, Tabs} from '@material-ui/core'
 import {useLocation, useHistory} from 'react-router-dom'
+import styled from 'styled-components'
 
 const menuData = [{
   label: '趋势图',
@@ -16,11 +17,19 @@ const menuData = [{
   pushPath: '/everyDayData/list',
 }]
 
+const Box = styled.div`
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  > main {
+    height: calc(100vh - 48px);
+  }
+`
 export const MenuLayout = ({children}: any) => {
   const location = useLocation()
   const history = useHistory()
   const value = menuData.findIndex(v => location.pathname.includes(v.value))
-  return <div>
+  return <Box>
     <AppBar position={'static'}>
       <Tabs
           value={value}
@@ -34,6 +43,8 @@ export const MenuLayout = ({children}: any) => {
         />)}
       </Tabs>
     </AppBar>
-    {children}
-  </div>
+    <main>
+      {children}
+    </main>
+  </Box>
 }

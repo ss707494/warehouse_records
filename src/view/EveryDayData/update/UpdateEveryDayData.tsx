@@ -1,22 +1,32 @@
 import React, {useEffect} from 'react'
-import {Button, TextField} from '@material-ui/core'
+import {Button} from '@material-ui/core'
 import {fpMergePre, fpSetPre, ls, setForm} from '../../../util/utils'
 import {useHistory} from 'react-router-dom'
 import styled from 'styled-components'
-import {KeyboardDatePicker} from '@material-ui/pickers'
 import {modelFactory} from '../../../util/ModelAction/modelUtil'
 import {db, IRecord} from '../../../util/db/appData'
 import {useStoreModel} from '../../../util/ModelAction/useStore'
 import {Space} from '../../../component/Space'
 import {showNotistack} from '../../../component/SnackbarProvider'
 
-const initForm = {
-  amount: '',
+const initForm: IRecord = {
+  stock: '',
   humidity: '',
   isDelete: 0,
   produceType: '',
   temperature: '',
   weather: '',
+  flourType: '',
+  flourAmount: '',
+  waterAmount: '',
+  appearance: '',
+  bestWaterAmount: '',
+  powderTime: '',
+  maturationTime: '',
+  isShortCard: false,
+  packageCondition: '',
+  qualityInspectorRecords: '',
+  customerFeedback: '',
 }
 export const updateEveryDayDataModel = modelFactory('UpdateEveryDayData', {
   form: initForm as IRecord,
@@ -43,16 +53,9 @@ export const updateEveryDayDataModel = modelFactory('UpdateEveryDayData', {
 const Box = styled.div`
   padding: 24px;
 `
-const Main = styled.div`
-  margin-top: 16px;
-  display: grid;
-  grid-gap: 16px;
-  grid-template-columns: repeat(2, 1fr);
-`
-
 export const UpdateEveryDayData = () => {
   const history = useHistory()
-  const {actions: actionsUpdateEveryDayData, state: stateUpdateEveryDayData} = useStoreModel(updateEveryDayDataModel)
+  const {actions: actionsUpdateEveryDayData} = useStoreModel(updateEveryDayDataModel)
   useEffect(() => {
     actionsUpdateEveryDayData.setForm(['createDate', new Date()])
   }, [actionsUpdateEveryDayData])
@@ -77,40 +80,40 @@ export const UpdateEveryDayData = () => {
           }}
       >{ls('返回')}</Button>
     </header>
-    <Main>
-      <KeyboardDatePicker
-          label={'取货日期'}
-          value={stateUpdateEveryDayData.form.createDate}
-          onChange={(date) => {
-            actionsUpdateEveryDayData.setForm(['createDate', date])
-          }}
-      />
-      <TextField
-          label={'天气'}
-          value={stateUpdateEveryDayData.form.weather}
-          onChange={(e) => {
-            actionsUpdateEveryDayData.setForm(['weather', e.target.value])
-          }}
-      />
-      <TextField
-          type={'number'}
-          label={'温度'}
-          value={stateUpdateEveryDayData.form.temperature}
-          onChange={(e) => {
-            actionsUpdateEveryDayData.setForm(['temperature', e.target.value])
-          }}
-          InputProps={{
-            endAdornment: <span>℃</span>
-          }}
-      />
-      <TextField
-          type={'number'}
-          label={'湿度'}
-          value={stateUpdateEveryDayData.form.humidity}
-          onChange={(e) => {
-            actionsUpdateEveryDayData.setForm(['humidity', e.target.value])
-          }}
-      />
-    </Main>
+    {/*<Main>*/}
+    {/*  <KeyboardDatePicker*/}
+    {/*      label={'取货日期'}*/}
+    {/*      value={stateUpdateEveryDayData.form.createDate}*/}
+    {/*      onChange={(date) => {*/}
+    {/*        actionsUpdateEveryDayData.setForm(['createDate', date])*/}
+    {/*      }}*/}
+    {/*  />*/}
+    {/*  <TextField*/}
+    {/*      label={'天气'}*/}
+    {/*      value={stateUpdateEveryDayData.form.weather}*/}
+    {/*      onChange={(e) => {*/}
+    {/*        actionsUpdateEveryDayData.setForm(['weather', e.target.value])*/}
+    {/*      }}*/}
+    {/*  />*/}
+    {/*  <TextField*/}
+    {/*      type={'number'}*/}
+    {/*      label={'温度'}*/}
+    {/*      value={stateUpdateEveryDayData.form.temperature}*/}
+    {/*      onChange={(e) => {*/}
+    {/*        actionsUpdateEveryDayData.setForm(['temperature', e.target.value])*/}
+    {/*      }}*/}
+    {/*      InputProps={{*/}
+    {/*        endAdornment: <span>℃</span>*/}
+    {/*      }}*/}
+    {/*  />*/}
+    {/*  <TextField*/}
+    {/*      type={'number'}*/}
+    {/*      label={'湿度'}*/}
+    {/*      value={stateUpdateEveryDayData.form.humidity}*/}
+    {/*      onChange={(e) => {*/}
+    {/*        actionsUpdateEveryDayData.setForm(['humidity', e.target.value])*/}
+    {/*      }}*/}
+    {/*  />*/}
+    {/*</Main>*/}
   </Box>
 }

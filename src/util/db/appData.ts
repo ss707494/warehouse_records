@@ -10,7 +10,7 @@ export class MyAppDatabase extends Dexie {
     super('MyAppDatabase')
     this.version(1).stores({
       contacts: '++id, first, last',
-      record: '++id, createDate, updateDate, isDelete, weather, temperature, humidity, produceType, amount',
+      record: '++id, createDate, updateDate, isDelete, weather, temperature, humidity, produceType, stock, flourType, flourAmount, waterAmount, appearance, bestWaterAmount, powderTime, maturationTime, isShortCard, packageCondition, qualityInspectorRecords, customerFeedback',
       //...other tables goes here...
     })
     // The following line is needed if your typescript
@@ -31,11 +31,39 @@ export interface IRecord {
   createDate?: Date,
   updateDate?: Date,
   isDelete: number,
+  // 天气
   weather: string,
+  // 温度
   temperature: number | string,
+  // 湿度
   humidity: number | string,
+  // 产品类型
   produceType: string,
-  amount: number | string,
+  // 数量
+  stock: number | string,
+  // 面粉类型
+  flourType?: string,
+  // 面粉用量
+  flourAmount?: number | string,
+  // 用水量
+  waterAmount?: number | string,
+  // 外观评价
+  appearance?: string,
+  // 最佳用水量
+  bestWaterAmount?: number | string,
+  // 打粉时间
+  powderTime?: number | string,
+  // 熟化时间
+  maturationTime?: number | string,
+  // 压缩中有无短片
+  isShortCard?: boolean,
+  // 包装情况
+  packageCondition?: string,
+  // 质检员记录情况
+  qualityInspectorRecords?: string,
+  // 客户反馈情况
+  customerFeedback?: string,
+
 }
 
 export const db = new MyAppDatabase()

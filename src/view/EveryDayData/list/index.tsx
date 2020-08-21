@@ -60,7 +60,7 @@ export const EveryDayDataList = () => {
             <TableCell>{v.weather}</TableCell>
             <TableCell>{v.temperature}</TableCell>
             <TableCell>{v.humidity}</TableCell>
-            <TableCell>{v.amount}</TableCell>
+            <TableCell>{v.stock}</TableCell>
           </TableRow>)}
         </TableBody>
       </Table>

@@ -1,64 +1,71 @@
 import React, {useEffect} from 'react'
-import {formatDate, ls} from '../../util/utils'
+import {ls} from '../../util/utils'
 import ReactEcharts from 'echarts-for-react'
 import styled from 'styled-components'
 import {useStoreModel} from '../../util/ModelAction/useStore'
 import {everyDayDataListModel} from '../EveryDayData/list'
-import {IRecord} from '../../util/db/appData'
-
-const dealOption = (listData: IRecord[]) => {
-  if (!listData.length) return {}
-  console.log(listData)
-  return {
-    toolbox: {
-      feature: {
-        magicType: {show: true, type: ['line', 'bar']},
-        saveAsImage: {show: true}
-      }
-    },
-    legend: {
-      data: ['温度', '湿度'],
-    },
-    yAxis: [
-      {
-        type: 'value',
-        name: '温度',
-      },
-      {
-        type: 'value',
-        name: '湿度',
-      },
-    ],
-    xAxis: {
-      data: listData.map(value => formatDate(value.createDate, 'YYYY/MM/dd')),
-    },
-    series: [{
-      name: '温度',
-      type: 'bar',
-      data: listData.map(value => value.temperature),
-    }, {
-      name: '湿度',
-      type: 'bar',
-      yAxisIndex: 1,
-      data: listData.map(value => value.humidity),
-    }],
-  }
-}
+import {Paper} from '@material-ui/core'
+import {dealOption} from './echartsData'
 
 const Box = styled.div`
   padding: 24px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  overflow-y: auto;
+`
+const ChartBox = styled.div`
+  flex-grow: 1;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-auto-flow: row;
+  grid-gap: 24px;
+  grid-auto-rows: max-content;
+  &&& {
+    .MuiPaper-root {
+      height: 37vh;
+    }
+  }
 `
 export const Home = () => {
   const {actions: actionsEveryDayDataListModel, state: stateEveryDayDataListModel} = useStoreModel(everyDayDataListModel)
   useEffect(() => {
     actionsEveryDayDataListModel.getList()
   }, [actionsEveryDayDataListModel])
-  console.log(stateEveryDayDataListModel.list)
 
   return <Box>
-    {stateEveryDayDataListModel.list.length && <ReactEcharts
-        option={dealOption(stateEveryDayDataListModel.list)}
-    />}
+    {stateEveryDayDataListModel.list.length && <ChartBox>
+      <Paper>
+        <ReactEcharts
+            style={{height: '100%'}}
+            option={dealOption(stateEveryDayDataListModel.list).temperature}
+        />
+      </Paper>
+      <Paper>
+        <ReactEcharts
+            style={{height: '100%'}}
+            option={dealOption(stateEveryDayDataListModel.list).flourAmount}
+        />
+      </Paper>
+      <Paper>
+        <ReactEcharts
+            style={{height: '100%'}}
+            option={dealOption(stateEveryDayDataListModel.list).produceTime}
+        />
+      </Paper>
+      <Paper>
+        <ReactEcharts
+            style={{height: '100%'}}
+            option={dealOption(stateEveryDayDataListModel.list).evaluation}
+        />
+      </Paper>
+      <Paper>
+        <ReactEcharts
+            style={{height: '100%'}}
+            option={dealOption(stateEveryDayDataListModel.list).stock}
+        />
+      </Paper>
+    </ChartBox>}
     <footer>
       {ls('示例参考')}
       <a

@@ -1,10 +1,10 @@
 import React, {useCallback, useEffect, useRef} from 'react'
-import {useParams, useHistory} from 'react-router-dom'
+import {useHistory, useParams} from 'react-router-dom'
 import {useStoreModel} from '../../../util/ModelAction/useStore'
 import {everyDayDataListModel} from '../../EveryDayData/list'
 import styled from 'styled-components'
 import {ls} from '../../../util/utils'
-import {Button, Divider, TextField} from '@material-ui/core'
+import {Button, Divider, InputAdornment, TextField, TextFieldProps} from '@material-ui/core'
 import {grey} from '@material-ui/core/colors'
 import {DatePicker} from '@material-ui/pickers'
 import {updateEveryDayDataModel} from '../../EveryDayData/update/UpdateEveryDayData'
@@ -12,6 +12,7 @@ import {cStyle} from '../../../util/style/commonStyle'
 import {showNotistack} from '../../../component/SnackbarProvider'
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline'
 import {Autocomplete} from '@material-ui/lab'
+import {GoodOrBad, GoodOrBadLabel} from '../../../util/dict'
 
 const Box = styled.div`
   margin: 32px;
@@ -31,16 +32,16 @@ const Header = styled.div`
     top: 16px;
   }
 `
-const MainForm = styled.div<{ref: any}>`
+const MainForm = styled.div<{ ref: any }>`
   display: grid;
 `
-const FormItem = styled.div`
+const FormItem = styled.div<React.HTMLProps<HTMLElement> & { flexBase?: number | string }>`
   display: flex;
-  padding: 8px 8px 8px 24px;
+  padding: 8px 16px 8px 24px;
   align-items: center;
-  //border-top: 1px solid ${grey[500]};
+  flex-basis: ${prop => prop.flexBase ?? 1};
   > aside {
-    margin-right: 16px;
+    margin-right: auto;
   }
 `
 const Title = styled.div`
@@ -62,7 +63,26 @@ const FitFoot = styled.div`
 const Foot = styled.div`
   padding: 8px 8px 8px 24px;
 `
+const Row = styled.div`
+  display: flex;
+`
+const TextFieldOut = styled(TextField)
+    .attrs(() => ({
+      size: 'small',
+      variant: 'outlined',
+    }))<TextFieldProps>`
+`
 
+const dealFocus = (e: any, submit: any) => {
+  // @ts-ignore
+  const inputList = [...document.querySelectorAll('input')]
+  const i = inputList.indexOf(e)
+  if (inputList.length === i + 1) {
+    submit()
+  } else {
+    inputList[i + 1].focus()
+  }
+}
 export const UpdateRecord = () => {
   const mainForm = useRef(null)
   const {id} = useParams()
@@ -73,7 +93,6 @@ export const UpdateRecord = () => {
   const init = useCallback(async () => {
     const res = await actionsEveryDayDataListModel.getList()
     if (!isAdd && res.length === 0) {
-      debugger
       history.push(`/simpleRecord/update/0`)
     }
   }, [actionsEveryDayDataListModel, history, isAdd])
@@ -107,14 +126,7 @@ export const UpdateRecord = () => {
     if (mainForm?.current) {
       const focusHelp = (e: any) => {
         if (e.charCode === 13) {
-          // @ts-ignore
-          const inputList = [...document.querySelectorAll('input')]
-          const i = inputList.indexOf(e.target)
-          if (inputList.length === i + 1) {
-            submit()
-          } else {
-            inputList[i + 1].focus()
-          }
+          dealFocus(e.target, submit)
         }
       }
       // @ts-ignore
@@ -125,6 +137,15 @@ export const UpdateRecord = () => {
       }
     }
   }, [actionsUpdateEveryDayData, submit])
+
+  const helpOptionFocus = (id: string) => ({
+    id: `main${id}`,
+    onClose: (event: any , reason: any) => {
+      if (reason === 'select-option') {
+        dealFocus(document.querySelector(`#main${id}`), submit)
+      }
+    }
+  })
 
   return <Box>
     <Header>
@@ -147,92 +168,318 @@ export const UpdateRecord = () => {
     <MainForm
         ref={mainForm}
     >
-      <FormItem>
-        <aside>{ls('日期')}</aside>
-        <main>
-          <DatePicker
-              inputVariant={'outlined'}
-              size={'small'}
-              value={stateUpdateEveryDayData.form.createDate}
-              onChange={(date) => {
-                actionsUpdateEveryDayData.setForm(['createDate', date])
-              }}
-              format={'yyyy/MM/dd'}
-          />
-        </main>
-      </FormItem>
+      <Row>
+        <FormItem flexBase={'20%'}>
+          <aside>{ls('日期')}</aside>
+          <main>
+            <DatePicker
+                inputVariant={'outlined'}
+                size={'small'}
+                value={stateUpdateEveryDayData.form.createDate}
+                onChange={(date) => {
+                  actionsUpdateEveryDayData.setForm(['createDate', date])
+                }}
+                format={'yyyy/MM/dd'}
+            />
+          </main>
+        </FormItem>
+        <Divider orientation={'vertical'}
+                 flexItem/>
+        <FormItem flexBase={'20%'}>
+          <aside>{ls('天气')}</aside>
+          <main>
+            <Autocomplete
+                {...helpOptionFocus('weather')}
+                openOnFocus={true}
+                style={{width: '223px'}}
+                options={['晴', '雨']}
+                freeSolo={true}
+                value={stateUpdateEveryDayData.form.weather}
+                onChange={(e, value) => {
+                  actionsUpdateEveryDayData.setForm(['weather', value])
+                }}
+                renderInput={(p) =>
+                    <TextFieldOut
+                        {...p}
+                    />
+                }
+            />
+          </main>
+        </FormItem>
+        <Divider orientation={'vertical'}
+                 flexItem/>
+        <FormItem flexBase={'20%'}>
+          <aside>{ls('温度')}</aside>
+          <main>
+            <TextFieldOut
+                type={'number'}
+                value={stateUpdateEveryDayData.form.temperature}
+                onChange={(e) => {
+                  actionsUpdateEveryDayData.setForm(['temperature', e.target.value])
+                }}
+                InputProps={{
+                  endAdornment: <InputAdornment
+                      position={'end'}
+                  >℃</InputAdornment>,
+                }}
+            />
+          </main>
+        </FormItem>
+        <Divider orientation={'vertical'}
+                 flexItem/>
+        <FormItem flexBase={'20%'}>
+          <aside>{ls('湿度')}</aside>
+          <main>
+            <TextFieldOut
+                type={'number'}
+                value={stateUpdateEveryDayData.form.humidity}
+                onChange={(e) => {
+                  actionsUpdateEveryDayData.setForm(['humidity', e.target.value])
+                }}
+            />
+          </main>
+        </FormItem>
+      </Row>
       <Divider/>
       <Title>基本信息</Title>
       <Divider/>
-      <FormItem>
-        <aside>{ls('天气')}</aside>
-        <main>
-          <Autocomplete
-              style={{width: '223px'}}
-              options={['晴', '雨']}
-              freeSolo={true}
-              value={stateUpdateEveryDayData.form.weather}
-              onChange={(e, value) => {
-                actionsUpdateEveryDayData.setForm(['weather', value])
-              }}
-              renderInput={(p) =>
-                <TextField
-                    {...p}
-                    variant={'outlined'}
-                    size={'small'}
-                />
-              }
-          />
-        </main>
-      </FormItem>
+      <Row>
+        <FormItem flexBase={'20%'}>
+          <aside>{ls('面粉品种')}</aside>
+          <main>
+            <TextFieldOut
+                value={stateUpdateEveryDayData.form.flourType}
+                onChange={(e) => {
+                  actionsUpdateEveryDayData.setForm(['flourType', e.target.value])
+                }}
+            />
+          </main>
+        </FormItem>
+        <Divider orientation={'vertical'}
+                 flexItem/>
+        <FormItem flexBase={'20%'}>
+          <aside>{ls('面粉量')}</aside>
+          <main>
+            <TextFieldOut
+                type={'number'}
+                value={stateUpdateEveryDayData.form.flourAmount}
+                onChange={(e) => {
+                  actionsUpdateEveryDayData.setForm(['flourAmount', e.target.value])
+                }}
+            />
+          </main>
+        </FormItem>
+        <Divider orientation={'vertical'}
+                 flexItem/>
+        <FormItem flexBase={'20%'}>
+          <aside>{ls('用水量')}</aside>
+          <main>
+            <TextFieldOut
+                type={'number'}
+                value={stateUpdateEveryDayData.form.waterAmount}
+                onChange={(e) => {
+                  actionsUpdateEveryDayData.setForm(['waterAmount', e.target.value])
+                }}
+            />
+          </main>
+        </FormItem>
+        <Divider orientation={'vertical'}
+                 flexItem/>
+        <FormItem flexBase={'12%'}>
+          <aside>{ls('产品外观')}</aside>
+          <main>
+            <Autocomplete
+                {...helpOptionFocus('appearance')}
+                openOnFocus={true}
+                options={Object.keys(GoodOrBad)}
+                getOptionLabel={key => GoodOrBadLabel[key] ?? ''}
+                value={stateUpdateEveryDayData.form.appearance}
+                onChange={(e, value) => {
+                  actionsUpdateEveryDayData.setForm(['appearance', value])
+                }}
+                renderInput={(p) =>
+                    <TextFieldOut
+                        {...p}
+                    />
+                }
+            />
+          </main>
+        </FormItem>
+        <Divider orientation={'vertical'}
+                 flexItem/>
+        <FormItem flexBase={'16%'}>
+          <aside>{ls('预测最佳水量')}</aside>
+          <main>
+            <TextFieldOut
+                style={{width: '160px'}}
+                value={stateUpdateEveryDayData.form.bestWaterAmount}
+                onChange={(e) => {
+                  actionsUpdateEveryDayData.setForm(['bestWaterAmount', e.target.value])
+                }}
+            >
+            </TextFieldOut>
+          </main>
+        </FormItem>
+      </Row>
+      <Title>{ls('生产过程')}</Title>
+      <Row>
+        <FormItem flexBase={'20%'}>
+          <aside>{ls('打粉时间')}</aside>
+          <main>
+            <TextFieldOut
+                type={'number'}
+                value={stateUpdateEveryDayData.form.powderTime}
+                onChange={(e) => {
+                  actionsUpdateEveryDayData.setForm(['powderTime', e.target.value])
+                }}
+                InputProps={{
+                  endAdornment: <InputAdornment
+                      position={'end'}
+                  >{ls('分钟')}</InputAdornment>,
+                }}
+            >
+            </TextFieldOut>
+          </main>
+        </FormItem>
+        <Divider orientation={'vertical'}
+                 flexItem/>
+        <FormItem flexBase={'20%'}>
+          <aside>{ls('熟化时间')}</aside>
+          <main>
+            <TextFieldOut
+                type={'number'}
+                value={stateUpdateEveryDayData.form.maturationTime}
+                onChange={(e) => {
+                  actionsUpdateEveryDayData.setForm(['maturationTime', e.target.value])
+                }}
+                InputProps={{
+                  endAdornment: <InputAdornment
+                      position={'end'}
+                  >{ls('分钟')}</InputAdornment>,
+                }}
+            >
+            </TextFieldOut>
+          </main>
+        </FormItem>
+        <Divider orientation={'vertical'}
+                 flexItem/>
+        <FormItem flexBase={'20%'}>
+          <aside>{ls('压缩中有无短片')}</aside>
+          <main>
+            <Autocomplete
+                {...helpOptionFocus('isShortCard')}
+                openOnFocus={true}
+                options={[true, false]}
+                getOptionLabel={key => key ? '有' : '无'}
+                value={stateUpdateEveryDayData.form.isShortCard}
+                onChange={(e, value) => {
+                  actionsUpdateEveryDayData.setForm(['isShortCard', value])
+                }}
+                renderInput={(p) =>
+                    <TextFieldOut
+                        {...p}
+                    />
+                }
+            />
+          </main>
+        </FormItem>
+        <Divider orientation={'vertical'}
+                 flexItem/>
+        <FormItem flexBase={'12%'}>
+          <aside>{ls('包装情况')}</aside>
+          <main>
+            <Autocomplete
+                {...helpOptionFocus('packageCondition')}
+                openOnFocus={true}
+                options={Object.keys(GoodOrBad)}
+                getOptionLabel={key => GoodOrBadLabel[key] ?? ''}
+                value={stateUpdateEveryDayData.form.packageCondition}
+                onChange={(e, value) => {
+                  actionsUpdateEveryDayData.setForm(['packageCondition', value])
+                }}
+                onClose={(event, reason) => {
+                  if (reason === 'select-option') {
+                    dealFocus(event.target, submit)
+                  }
+                }}
+                renderInput={(p) =>
+                    <TextFieldOut
+                        {...p}
+                    />
+                }
+            />
+          </main>
+        </FormItem>
+        <Divider orientation={'vertical'}
+                 flexItem/>
+      </Row>
+      <Title>{ls('品质追踪')}</Title>
+      <Row>
+        <FormItem flexBase={'20%'}>
+          <aside>{ls('质检员记录情况')}</aside>
+          <main>
+            <Autocomplete
+                {...helpOptionFocus('qualityInspectorRecords')}
+                openOnFocus={true}
+                options={Object.keys(GoodOrBad)}
+                getOptionLabel={key => GoodOrBadLabel[key] ?? ''}
+                value={stateUpdateEveryDayData.form.qualityInspectorRecords}
+                onChange={(e, value) => {
+                  actionsUpdateEveryDayData.setForm(['qualityInspectorRecords', value])
+                }}
+                renderInput={(p) =>
+                    <TextFieldOut
+                        {...p}
+                    />
+                }
+            />
+          </main>
+        </FormItem>
+        <Divider orientation={'vertical'}
+                 flexItem/>
+        <FormItem flexBase={'20%'}>
+          <aside>{ls('客户反馈情况')}</aside>
+          <main>
+            <Autocomplete
+                {...helpOptionFocus('customerFeedback')}
+                openOnFocus={true}
+                options={Object.keys(GoodOrBad)}
+                getOptionLabel={key => GoodOrBadLabel[key] ?? ''}
+                getOptionSelected={(option, value) => {
+                  return option === value
+                }}
+                value={stateUpdateEveryDayData.form.customerFeedback}
+                onChange={(e, value) => {
+                  actionsUpdateEveryDayData.setForm(['customerFeedback', value])
+                }}
+                renderInput={(p) =>
+                    <TextFieldOut
+                        {...p}
+                    />
+                }
+            />
+          </main>
+        </FormItem>
+        <Divider orientation={'vertical'}
+                 flexItem/>
+      </Row>
       <Divider/>
-      <FormItem>
-        <aside>{ls('温度')}</aside>
-        <main>
-          <TextField
-              type={'number'}
-              size={'small'}
-              variant={'outlined'}
-              value={stateUpdateEveryDayData.form.temperature}
-              onChange={(e) => {
-                actionsUpdateEveryDayData.setForm(['temperature', e.target.value])
-              }}
-              InputProps={{
-                endAdornment: <span>℃</span>,
-              }}
-          />
-        </main>
-      </FormItem>
-      <Divider/>
-      <FormItem>
-        <aside>{ls('湿度')}</aside>
-        <main>
-          <TextField
-              type={'number'}
-              size={'small'}
-              variant={'outlined'}
-              value={stateUpdateEveryDayData.form.humidity}
-              onChange={(e) => {
-                actionsUpdateEveryDayData.setForm(['humidity', e.target.value])
-              }}
-          />
-        </main>
-      </FormItem>
-      <Divider/>
-      <FormItem>
-        <aside>{ls('数量')}</aside>
-        <main>
-          <TextField
-              type={'number'}
-              size={'small'}
-              variant={'outlined'}
-              value={stateUpdateEveryDayData.form.amount}
-              onChange={(e) => {
-                actionsUpdateEveryDayData.setForm(['amount', e.target.value])
-              }}
-          />
-        </main>
-      </FormItem>
+      <Row>
+        <FormItem flexBase={'20%'}>
+          <aside>{ls('当前库存')}</aside>
+          <main>
+            <TextFieldOut
+                type={'number'}
+                value={stateUpdateEveryDayData.form.stock}
+                onChange={(e) => {
+                  actionsUpdateEveryDayData.setForm(['stock', e.target.value])
+                }}
+            />
+          </main>
+        </FormItem>
+        <Divider orientation={'vertical'}
+                 flexItem/>
+      </Row>
       <Divider/>
       <Foot>
         <Button
