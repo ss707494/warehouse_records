@@ -8,7 +8,8 @@ export class MyAppDatabase extends Dexie {
 
   constructor() {
     super('MyAppDatabase')
-    this.version(1).stores({
+    this.version(12)
+        .stores({
       contacts: '++id, first, last',
       record: '++id, createDate, updateDate, isDelete, weather, temperature, humidity, produceType, stock, flourType, flourAmount, waterAmount, appearance, bestWaterAmount, powderTime, maturationTime, isShortCard, packageCondition, qualityInspectorRecords, customerFeedback',
       //...other tables goes here...
