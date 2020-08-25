@@ -15,3 +15,5 @@ cd /usr/ss707494/zw_project/warehouse_records/build
 put -r D:\code\zw\warehouse_records\build
 
 scp -r D:\code\zw\warehouse_records\build root@8.210.23.30:/usr/ss707494/zw_project/warehouse_records/build
+
+scp D:\code\zw\warehouse_records\express\server.js root@8.210.23.30:/usr/ss707494/zw_project/warehouse_records/server.js

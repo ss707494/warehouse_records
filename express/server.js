@@ -21,6 +21,7 @@ const init = () => {
     app.use(express.static(resolveApp('build')))
 
     app.post('/writeToFile', (req, res) => {
+      console.log(req.body)
       fs.writeFileSync('./dataByFile.txt', JSON.stringify(req.body))
       res.send(`${getNumber()}`)
     })

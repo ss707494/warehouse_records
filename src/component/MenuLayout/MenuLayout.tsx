@@ -60,6 +60,10 @@ export const MenuLayout = ({children}: any) => {
             onClick={() => {
               fetch('/writeToFile', {
                 method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json'
+                },
                 body: JSON.stringify({
                   recordList: stateEveryDayDataListModel.list,
                 }),
