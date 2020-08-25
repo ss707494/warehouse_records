@@ -3,8 +3,9 @@ import {EChartOption} from "echarts"
 import {formatDate} from '../../util/utils'
 import {GoodOrBadLabel} from '../../util/dict'
 
+export type OptionNameKey = 'temperature' | 'flourAmount' | 'produceTime' | 'evaluation' | 'stock'
 export const dealOption: (listData: IRecord[]) => {
-  [key in 'temperature' | 'flourAmount' | 'produceTime' | 'evaluation' | 'stock']: EChartOption
+  [key in OptionNameKey]: EChartOption
 } = (listData: IRecord[]) => {
   return {
     temperature: {
